@@ -1,6 +1,7 @@
 #include <unistd.h>
-#include <cstdlib>
 #include <dirent.h>
+#include <cstdlib>
+#include <cassert>
 
 #include <opencv2/highgui/highgui.hpp>
 
@@ -8,7 +9,7 @@
 #include <iostream>
 
 
-int displayOutput(bool video_flag, int video_index, bool dir_flag, char* dir_path);
+int displayImageFeed(bool video_flag, int video_index, bool dir_flag, char* dir_path);
 
 void print_usage(char* name)
 {
@@ -53,18 +54,25 @@ int main(int argc, char** argv)
         }
     }
 
-    int return_val = displayOutput(video_flag, video_index, dir_flag, dir_path);
-
-    return return_val;
+    return displayImageFeed(video_flag, video_index, dir_flag, dir_path);
 }
 
-int displayOutput(bool video_flag, int video_index, bool dir_flag, char* dir_path)
+// Displays images from either a specified video device or from images in a specified directory.
+// Either video_flag or dir_flag must be true, but NOT both!
+// video_index specified the video device.
+// dir_path specified the directory to display images from. This directory should contain only image files.
+int displayImageFeed(bool video_flag, int video_index, bool dir_flag, char* dir_path)
 {
+    // Assertions:
+    assert(video_flag ^ dir_flag); // Only video_flag xor dir_flag should be true. Not both!
+    if (dir_flag) {
+        assert(dir_path); // dir_path should not be NULL if dir_flag is true.
+    }
+
     // The right and left arrow key codes seem to differ from system to system.
-    // Change these values as necessary
+    // Change these values as necessary.
     const int RIGHT_ARROW_KEY = 65363;
     const int LEFT_ARROW_KEY = 65361;
-
 
     cv::namedWindow("Output");
     cv::Mat image;
