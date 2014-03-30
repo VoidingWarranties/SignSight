@@ -2,4 +2,4 @@ CFLAGS = `pkg-config --cflags opencv`
 LIBS = `pkg-config --libs opencv`
 
 SignSight : SignSight.cpp
-	g++ $(CFLAGS) $(LIBS) -o $@ $<
+	g++ $(CFLAGS) $(LIBS) -Wall -Wextra -o $@ $<
