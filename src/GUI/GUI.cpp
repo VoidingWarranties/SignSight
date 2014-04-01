@@ -32,6 +32,7 @@ int displayImageFeed(bool video_flag, int video_index, bool dir_flag, const std:
             cam >> image;
             if (! image.data) {
                 std::cerr << "Error reading camera data. Did someone unplug it?" << std::endl;
+                return 1;
             }
 
             if (processingFunction) {
