@@ -5,7 +5,6 @@
 
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/core/core.hpp>
 
 #include <list>
 #include <vector>
@@ -185,7 +184,7 @@ std::vector<std::vector<cv::Point> > segmentForeground(const cv::Mat& image)
     // Gaussian blur to remove noise.
     cv::GaussianBlur(gray, gray, cv::Size(5,5), 0, 0, cv::BORDER_DEFAULT);
 
-    // Detect edges using canny edge detection.
+    // Detect edges using Canny edge detection.
     int lowThreshold = 100;
     cv::Mat edges;
     cv::Canny(gray, edges, lowThreshold, lowThreshold * 3, 3);
