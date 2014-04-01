@@ -25,7 +25,7 @@ void print_usage(char* name)
 
 int main(int argc, char** argv)
 {
-    bool video_dev_flag = false;
+    bool video_dev_flag = true;
     int video_index = 0;
     bool video_file_flag = false;
     char* video_path = NULL;
