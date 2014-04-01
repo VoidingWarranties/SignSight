@@ -5,25 +5,22 @@
 #include <vector>
 
 #include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
 
 #include "GUI/GUI.hpp"
-#include "GUI/Draw.hpp"
-#include "ImageProcessing/ImageProcessing.hpp"
 
 
 // Displays images from either a specified video device or from images in a specified directory.
 // Either video_flag or dir_flag must be true, but NOT both!
 // video_index specified the video device.
-int displayImageFeed(bool video_flag, int video_index, bool dir_flag, const std::list<char*>& file_paths)
+int displayImageFeed(bool video_flag, int video_index, bool dir_flag, const std::list<char*>& file_paths, cv::Mat (*processingFunction)(cv::Mat&))
 {
     // Assertions / assumptions:
     assert(video_flag ^ dir_flag); // Only video_flag xor dir_flag should be true. Not both!
 
     // The right and left arrow key codes seem to differ from system to system.
     // Change these values as necessary.
-    const int RIGHT_ARROW_KEY = 65363;
-    const int LEFT_ARROW_KEY = 65361;
+    const int RIGHT_ARROW_KEY = 81;
+    const int LEFT_ARROW_KEY = 83;
 
     cv::namedWindow("Output");
     cv::Mat image;
@@ -37,9 +34,9 @@ int displayImageFeed(bool video_flag, int video_index, bool dir_flag, const std:
                 std::cerr << "Error reading camera data. Did someone unplug it?" << std::endl;
             }
 
-            // Segment the image and draw bounding rectangles for each contour.
-            std::vector<std::vector<cv::Point> > contours = segmentForeground(image);
-            drawBoundingRectangles(image, contours, cv::Scalar(0,255,0));
+            if (processingFunction) {
+                image = processingFunction(image);
+            }
 
             cv::imshow("Output", image);
 
@@ -58,18 +55,13 @@ int displayImageFeed(bool video_flag, int video_index, bool dir_flag, const std:
                 return 1;
             }
 
-            // Resize image if it is very large.
-            while (image.rows > 1000 || image.cols > 1000) {
-                cv::resize(image, image, cv::Size(image.cols / 2, image.rows / 2));
+            if (processingFunction) {
+                image = processingFunction(image);
             }
-
-            // Segment the image and draw bounding rectangles for each contour.
-            std::vector<std::vector<cv::Point> > contours = segmentForeground(image);
-            drawBoundingRectangles(image, contours, cv::Scalar(0,255,0));
 
             cv::imshow("Output", image);
 
-            int key = cv::waitKey();
+            char key = cv::waitKey();
             if (key == 'q') {
                 break;
             } else if (key == RIGHT_ARROW_KEY) {

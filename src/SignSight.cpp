@@ -6,8 +6,14 @@
 #include <list>
 #include <iostream>
 
-#include "GUI/GUI.hpp"
+#include <opencv2/imgproc/imgproc.hpp>
 
+#include "GUI/GUI.hpp"
+#include "GUI/Draw.hpp"
+#include "ImageProcessing/ImageProcessing.hpp"
+
+
+cv::Mat processingFunction(cv::Mat& image);
 
 void print_usage(char* name)
 {
@@ -75,5 +81,18 @@ int main(int argc, char** argv)
         }
     }
 
-    return displayImageFeed(video_flag, video_index, dir_flag, file_paths);
+    return displayImageFeed(video_flag, video_index, dir_flag, file_paths, processingFunction);
+}
+
+cv::Mat processingFunction(cv::Mat& image)
+{
+    // Resize the image if it is very large.
+    while (image.rows > 1000 || image.cols > 1000) {
+        cv::resize(image, image, cv::Size(image.cols / 2, image.rows / 2));
+    }
+
+    std::vector<std::vector<cv::Point> > contours = segmentForeground(image);
+    drawBoundingRectangles(image, contours, cv::Scalar(0,255,0));
+
+    return image;
 }
