@@ -12,10 +12,12 @@
 // Displays images from either a specified video device or from images in a specified directory.
 // Either video_flag or dir_flag must be true, but NOT both!
 // video_index specified the video device.
-int displayImageFeed(bool video_flag, int video_index, bool dir_flag, const std::list<char*>& file_paths, cv::Mat (*processingFunction)(cv::Mat&))
+int displayImageFeed(bool video_dev_flag, int video_index, bool video_file_flag, char* video_path, bool dir_flag, const std::list<char*>& file_paths, cv::Mat (*processingFunction)(cv::Mat&))
 {
     // Assertions / assumptions:
-    assert(video_flag ^ dir_flag); // Only video_flag xor dir_flag should be true. Not both!
+    assert((video_dev_flag && !video_file_flag && !dir_flag) ||
+           (!video_dev_flag && video_file_flag && !dir_flag) ||
+           (!video_dev_flag && !video_file_flag && dir_flag)); // Only one of the flags should be true.
 
     // The right and left arrow key codes seem to differ from system to system.
     // Change these values as necessary.
@@ -25,47 +27,44 @@ int displayImageFeed(bool video_flag, int video_index, bool dir_flag, const std:
     cv::namedWindow("Output");
     cv::Mat image;
 
-    if (video_flag) {
-        cv::VideoCapture cam(video_index);
-        // Image display loop.
-        while (true) {
-            cam >> image;
-            if (! image.data) {
-                std::cerr << "Error reading camera data. Did someone unplug it?" << std::endl;
-                return 1;
-            }
-
-            if (processingFunction) {
-                image = processingFunction(image);
-            }
-
-            cv::imshow("Output", image);
-
-            char key = cv::waitKey(10);
-            if (key == 'q') {
-                break;
-            }
-        }
+    cv::VideoCapture cam;
+    std::list<char*>::const_iterator file_itr;
+    if (video_dev_flag) {
+        cam.open(video_index);
+    } else if (video_file_flag) {
+        cam.open(video_path);
     } else if (dir_flag) {
-        std::list<char*>::const_iterator file_itr = file_paths.begin();
-        // Image display loop.
-        while (true) {
+        file_itr = file_paths.begin();
+    }
+
+    int wait_amount = 10;
+    if (dir_flag) {
+        wait_amount = 0;
+    }
+    while (true) {
+        if (video_dev_flag || video_file_flag) {
+            cam >> image;
+        } else if (dir_flag) {
             image = cv::imread(*file_itr);
-            if (! image.data) {
-                std::cerr << "Error reading image file " << *file_itr << std::endl;
-                return 1;
-            }
+        }
 
-            if (processingFunction) {
-                image = processingFunction(image);
-            }
+        if (! image.data) {
+            std::cerr << "Error reading from device or file." << std::endl;
+            return 1;
+        }
 
-            cv::imshow("Output", image);
+        if (processingFunction) {
+            image = processingFunction(image);
+        }
 
-            char key = cv::waitKey();
-            if (key == 'q') {
-                break;
-            } else if (key == RIGHT_ARROW_KEY) {
+        cv::imshow("Output", image);
+
+        char key = cv::waitKey(wait_amount);
+        if (key == 'q') {
+            break;
+        }
+        if (dir_flag) {
+            if (key == RIGHT_ARROW_KEY) {
                 ++file_itr;
                 if (file_itr == file_paths.end()) {
                     file_itr = file_paths.begin();

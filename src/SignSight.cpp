@@ -17,7 +17,7 @@ cv::Mat processingFunction(cv::Mat& image);
 
 void print_usage(char* name)
 {
-    std::cerr << "Usage: " << name << " [-v <video_device_index> | -f <image_directory_path>]"
+    std::cerr << "Usage: " << name << " [-v <video_device_index> | -f <video_file> | -d <image_directory_path>]"
               << "\n\n"
               << "       If no options are specified video device 0 is used by default."
               << std::endl;
@@ -25,24 +25,34 @@ void print_usage(char* name)
 
 int main(int argc, char** argv)
 {
-    bool video_flag = true;
+    bool video_dev_flag = false;
     int video_index = 0;
+    bool video_file_flag = false;
+    char* video_path = NULL;
     bool dir_flag = false;
     char* dir_path = NULL;
 
     opterr = 0;
     char c;
 
-    while ((c = getopt(argc, argv, "v:f:")) != -1) {
+    while ((c = getopt(argc, argv, "v:f:d:")) != -1) {
         switch (c) {
             case 'v':
-                video_flag = true;
+                video_dev_flag = true;
+                video_file_flag = false;
                 dir_flag = false;
                 video_index = atoi(optarg);
                 break;
             case 'f':
+                video_dev_flag = false;
+                video_file_flag = true;
+                dir_flag = false;
+                video_path = optarg;
+                break;
+            case 'd':
+                video_dev_flag = false;
+                video_file_flag = false;
                 dir_flag = true;
-                video_flag = false;
                 dir_path = optarg;
                 break;
             case '?':
@@ -52,7 +62,7 @@ int main(int argc, char** argv)
             default:
                 return 1;
         }
-        if (video_flag && dir_flag) {
+        if ((video_dev_flag && video_file_flag) || (video_dev_flag && dir_flag) || (video_file_flag && dir_flag)) {
             print_usage(argv[0]);
             return 1;
         }
@@ -81,7 +91,7 @@ int main(int argc, char** argv)
         }
     }
 
-    return displayImageFeed(video_flag, video_index, dir_flag, file_paths, processingFunction);
+    return displayImageFeed(video_dev_flag, video_index, video_file_flag, video_path, dir_flag, file_paths, processingFunction);
 }
 
 cv::Mat processingFunction(cv::Mat& image)
