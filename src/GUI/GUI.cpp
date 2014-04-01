@@ -40,7 +40,7 @@ int displayImageFeed(bool video_flag, int video_index, bool dir_flag, const std:
 
             cv::imshow("Output", image);
 
-            int key = cv::waitKey(10);
+            char key = cv::waitKey(10);
             if (key == 'q') {
                 break;
             }
