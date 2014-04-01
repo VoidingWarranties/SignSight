@@ -1,10 +1,11 @@
 #include <cassert>
 
-#include <opencv2/imgproc/imgproc.hpp>
-
 #include <vector>
 
+#include <opencv2/imgproc/imgproc.hpp>
+
 #include "ImageProcessing.hpp"
+
 
 // Returns a segmented version of the input image.
 // Currently it uses the watershed method for segmentation.

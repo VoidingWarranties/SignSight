@@ -1,6 +1,6 @@
-#include <opencv2/imgproc/imgproc.hpp>
-
 #include <vector>
+
+#include <opencv2/imgproc/imgproc.hpp>
 
 #include "GUI/Draw.hpp"
 

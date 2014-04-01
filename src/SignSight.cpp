@@ -1,7 +1,9 @@
-#include <unistd.h>
 #include <cstdlib>
-#include <cassert>
+#include <cstring>
+#include <dirent.h>
+#include <unistd.h>
 
+#include <list>
 #include <iostream>
 
 #include "GUI/GUI.hpp"
@@ -50,5 +52,28 @@ int main(int argc, char** argv)
         }
     }
 
-    return displayImageFeed(video_flag, video_index, dir_flag, dir_path);
+    // Build a list of files in the specified directory
+    std::list<char*> file_paths;
+    if (dir_flag) {
+        DIR* dir = opendir(dir_path);
+        if (! dir) {
+            std::cerr << "Directory " << dir_path << " does not exist!" << std::endl;
+            return 1;
+        }
+        // Iterate over all files in the specified directory.
+        dirent* file;
+        while ((file = readdir(dir)) != NULL) {
+            if (file && file->d_type == DT_REG) {
+                // Form the path by concatenating dir_path with each file name.
+                char* buffer = new char[strlen(dir_path) + strlen(file->d_name) + 2]();
+                strcpy(buffer, dir_path);
+                buffer[strlen(dir_path)] = '/';
+                strcpy(buffer + strlen(dir_path) + 1, file->d_name);
+                // Add the buffer to the end of the doubly linked list.
+                file_paths.push_back(buffer);
+            }
+        }
+    }
+
+    return displayImageFeed(video_flag, video_index, dir_flag, file_paths);
 }
