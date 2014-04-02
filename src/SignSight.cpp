@@ -47,13 +47,13 @@ int main(int argc, char** argv)
                 video_dev_flag = false;
                 video_file_flag = true;
                 dir_flag = false;
-                video_path = optarg;
+                video_path = strdup(optarg);
                 break;
             case 'd':
                 video_dev_flag = false;
                 video_file_flag = false;
                 dir_flag = true;
-                dir_path = optarg;
+                dir_path = strdup(optarg);
                 break;
             case '?':
                 print_usage(argv[0]);
@@ -91,7 +91,12 @@ int main(int argc, char** argv)
         }
     }
 
-    return displayImageFeed(video_dev_flag, video_index, video_file_flag, video_path, dir_flag, file_paths, processingFunction);
+    int return_val = displayImageFeed(video_dev_flag, video_index, video_file_flag, video_path, dir_flag, file_paths, processingFunction);
+
+    delete [] video_path;
+    delete [] dir_path;
+
+    return return_val;
 }
 
 cv::Mat processingFunction(cv::Mat& image)
