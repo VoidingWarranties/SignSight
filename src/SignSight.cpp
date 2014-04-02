@@ -62,10 +62,10 @@ int main(int argc, char** argv)
             default:
                 return 1;
         }
-        if ((video_dev_flag && video_file_flag) || (video_dev_flag && dir_flag) || (video_file_flag && dir_flag)) {
-            print_usage(argv[0]);
-            return 1;
-        }
+    }
+    if (((video_dev_flag && video_file_flag) || (video_dev_flag && dir_flag) || (video_file_flag && dir_flag)) && (video_dev_flag || video_file_flag || dir_flag)) {
+        print_usage(argv[0]);
+        return 1;
     }
 
     // Build a list of files in the specified directory
