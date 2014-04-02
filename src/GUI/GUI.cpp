@@ -31,8 +31,16 @@ int displayImageFeed(bool video_dev_flag, int video_index, bool video_file_flag,
     std::list<char*>::const_iterator file_itr;
     if (video_dev_flag) {
         cam.open(video_index);
+        if (! cap.isOpened()) {
+            std::cerr << "Error opening video device " << video_index << std::endl;
+            return 1;
+        }
     } else if (video_file_flag) {
         cam.open(video_path);
+        if (! cap.isOpened()) {
+            std::cerr << "Error opening video file " << video_path << std::endl;
+            return 1;
+        }
     } else if (dir_flag) {
         file_itr = file_paths.begin();
     }
