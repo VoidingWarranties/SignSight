@@ -19,11 +19,6 @@ int displayImageFeed(bool video_dev_flag, int video_index, bool video_file_flag,
            (!video_dev_flag && video_file_flag && !dir_flag) ||
            (!video_dev_flag && !video_file_flag && dir_flag)); // Only one of the flags should be true.
 
-    // The right and left arrow key codes seem to differ from system to system.
-    // Change these values as necessary.
-    const int RIGHT_ARROW_KEY = 81;
-    const int LEFT_ARROW_KEY = 83;
-
     cv::namedWindow("Output");
     cv::Mat image;
 
@@ -68,7 +63,7 @@ int displayImageFeed(bool video_dev_flag, int video_index, bool video_file_flag,
         cv::imshow("Output", image);
 
         char key = cv::waitKey(wait_amount);
-        if (key == 'q') {
+        if (key == ESCAPE_KEY) {
             break;
         }
         if (dir_flag) {

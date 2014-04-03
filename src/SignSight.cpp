@@ -17,9 +17,13 @@ cv::Mat processingFunction(cv::Mat& image);
 
 void print_usage(char* name)
 {
-    std::cerr << "Usage: " << name << " [-v <video_device_index> | -f <video_file> | -d <image_directory_path>]"
-              << "\n\n"
-              << "       If no options are specified video device 0 is used by default."
+    std::cerr << "\n"
+              << "Usage: " << name << " [-v <video_device_index> | -f <video_file> | -d <image_directory_path>]\n"
+              << "\tIf no options are specified video device 0 is used by default.\n"
+              << "Hot keys:\n"
+              << "\tESC - exit the program\n"
+              << "\tLEFT ARROW - previous image (only when the -d option is used)\n"
+              << "\tRIGHT ARROW - next image (only when the -d option is used)\n"
               << std::endl;
 }
 

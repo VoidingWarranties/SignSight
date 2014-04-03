@@ -10,14 +10,20 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
+#include "GUI/GUI.hpp"
 #include "GUI/Draw.hpp"
 #include "ImageProcessing/ImageProcessing.hpp"
 
 
 void print_usage(char* name)
 {
-    std::cerr << "Usage: " << name << " [-f <video_file> | -d <image_directory_path>] -o <output_directory>\n"
-              << "       If no options are specified video device 0 is used by default."
+    std::cerr << "\n"
+              << "Usage: " << name << " [-f <video_file> | -d <image_directory_path>] -o <output_directory>\n"
+              << "\tIf no options are specified video device 0 is used by default.\n"
+              << "Hot keys:\n"
+              << "\tESC - exit the program\n"
+              << "\ty - confirm selected sub-image as a street sign and save the sub-image to the output directory\n"
+              << "\tn - reject selected sub-image as a street sign and do NOT save the sub-image\n"
               << std::endl;
 }
 
@@ -137,7 +143,7 @@ int main(int argc, char** argv)
 
             while (true) {
                 char key = cv::waitKey();
-                if (key == 'q') {
+                if (key == ESCAPE_KEY) {
                     goto exit_loop;
                 } else if (key == 'n') {
                     cv::rectangle(display_image, bounding_rects[i], cv::Scalar(0,0,255), 2);
