@@ -4,6 +4,7 @@
 #include <unistd.h>
 
 #include <list>
+#include <string>
 #include <iostream>
 
 #include <opencv2/imgproc/imgproc.hpp>
@@ -32,9 +33,9 @@ int main(int argc, char** argv)
     bool video_dev_flag = true;
     int video_index = 0;
     bool video_file_flag = false;
-    char* video_path = NULL;
+    std::string video_path;
     bool dir_flag = false;
-    char* dir_path = NULL;
+    std::string dir_path;
 
     opterr = 0;
     char c;
@@ -51,13 +52,13 @@ int main(int argc, char** argv)
                 video_dev_flag = false;
                 video_file_flag = true;
                 dir_flag = false;
-                video_path = strdup(optarg);
+                video_path = std::string(optarg);
                 break;
             case 'd':
                 video_dev_flag = false;
                 video_file_flag = false;
                 dir_flag = true;
-                dir_path = strdup(optarg);
+                dir_path = std::string(optarg);
                 break;
             case '?':
                 print_usage(argv[0]);
@@ -73,9 +74,9 @@ int main(int argc, char** argv)
     }
 
     // Build a list of files in the specified directory
-    std::list<char*> file_paths;
+    std::list<std::string> file_paths;
     if (dir_flag) {
-        DIR* dir = opendir(dir_path);
+        DIR* dir = opendir(dir_path.c_str());
         if (! dir) {
             std::cerr << "Directory " << dir_path << " does not exist!" << std::endl;
             return 1;
@@ -84,21 +85,12 @@ int main(int argc, char** argv)
         dirent* file;
         while ((file = readdir(dir)) != NULL) {
             if (file && file->d_type == DT_REG) {
-                // Form the path by concatenating dir_path with each file name.
-                char* buffer = new char[strlen(dir_path) + strlen(file->d_name) + 2]();
-                strcpy(buffer, dir_path);
-                buffer[strlen(dir_path)] = '/';
-                strcpy(buffer + strlen(dir_path) + 1, file->d_name);
-                // Add the buffer to the end of the doubly linked list.
-                file_paths.push_back(buffer);
+                file_paths.push_back(dir_path + "/" + file->d_name);
             }
         }
     }
 
     int return_val = displayImageFeed(video_dev_flag, video_index, video_file_flag, video_path, dir_flag, file_paths, processingFunction);
-
-    delete [] video_path;
-    delete [] dir_path;
 
     return return_val;
 }

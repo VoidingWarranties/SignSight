@@ -12,7 +12,7 @@
 // Displays images from either a specified video device or from images in a specified directory.
 // Either video_flag or dir_flag must be true, but NOT both!
 // video_index specified the video device.
-int displayImageFeed(bool video_dev_flag, int video_index, bool video_file_flag, char* video_path, bool dir_flag, const std::list<char*>& file_paths, cv::Mat (*processingFunction)(cv::Mat&))
+int displayImageFeed(bool video_dev_flag, int video_index, bool video_file_flag, const std::string& video_path, bool dir_flag, const std::list<std::string>& file_paths, cv::Mat (*processingFunction)(cv::Mat&))
 {
     // Assertions / assumptions:
     assert((video_dev_flag && !video_file_flag && !dir_flag) ||
@@ -23,7 +23,7 @@ int displayImageFeed(bool video_dev_flag, int video_index, bool video_file_flag,
     cv::Mat image;
 
     cv::VideoCapture cam;
-    std::list<char*>::const_iterator file_itr;
+    std::list<std::string>::const_iterator file_itr;
     if (video_dev_flag) {
         cam.open(video_index);
         if (! cam.isOpened()) {

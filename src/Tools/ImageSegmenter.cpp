@@ -4,6 +4,7 @@
 #include <unistd.h>
 
 #include <list>
+#include <string>
 #include <vector>
 #include <iostream>
 
@@ -30,10 +31,10 @@ void print_usage(char* name)
 int main(int argc, char** argv)
 {
     bool video_flag = true;
-    char* video_path = NULL;
+    std::string video_path;
     bool dir_flag = false;
-    char* dir_path = NULL;
-    char* output_path = NULL;
+    std::string dir_path;
+    std::string output_path;
 
     opterr = 0;
     char c;
@@ -43,15 +44,15 @@ int main(int argc, char** argv)
             case 'f':
                 video_flag = true;
                 dir_flag = false;
-                video_path = strdup(optarg);
+                video_path = std::string(optarg);
                 break;
             case 'd':
                 dir_flag = true;
                 video_flag = false;
-                dir_path = strdup(optarg);
+                dir_path = std::string(optarg);
                 break;
             case 'o':
-                output_path = strdup(optarg);
+                output_path = std::string(optarg);
                 break;
             case '?':
                 print_usage(argv[0]);
@@ -61,17 +62,17 @@ int main(int argc, char** argv)
                 return 1;
         }
     }
-    if ((!(video_flag ^ dir_flag)) || (! output_path)) {
+    if ((!(video_flag ^ dir_flag)) || output_path.length() <= 0) {
         print_usage(argv[0]);
         return 1;
     }
 
     cv::VideoCapture cam;
-    std::list<char*> file_paths;
+    std::list<std::string> file_paths;
     if (video_flag) {
         cam.open(video_path);
     } else if (dir_flag) {
-        DIR* dir = opendir(dir_path);
+        DIR* dir = opendir(dir_path.c_str());
         if (! dir) {
             std::cerr << "Directory " << dir_path << " does not exist!" << std::endl;
             return 1;
@@ -79,11 +80,7 @@ int main(int argc, char** argv)
         dirent* file;
         while ((file = readdir(dir)) != NULL) {
             if (file && file->d_type == DT_REG) {
-                char* buffer = new char[strlen(dir_path) + strlen(file->d_name) + 2]();
-                strcpy(buffer, dir_path);
-                buffer[strlen(dir_path)] = '/';
-                strcpy(buffer + strlen(dir_path) + 1, file->d_name);
-                file_paths.push_back(buffer);
+                file_paths.push_back(dir_path + "/" + file->d_name);
             }
         }
         if (file_paths.size() == 0) {
@@ -92,7 +89,7 @@ int main(int argc, char** argv)
         }
     }
 
-    std::list<char*>::const_iterator file_itr = file_paths.begin();
+    std::list<std::string>::const_iterator file_itr = file_paths.begin();
     size_t sign_index = 0;
     while (true) {
         cv::Mat image;
@@ -121,14 +118,7 @@ int main(int argc, char** argv)
 
         for (size_t i = 0; i < contours.size(); ++i) {
             // Construct file output path.
-            char* sub_img_output_path = new char[strlen(output_path) + 10];
-            strcpy(sub_img_output_path, output_path);
-            sub_img_output_path[strlen(output_path)] = '/';
-            for (size_t digit = 4, tmp_sign_index = sign_index; digit > 0; --digit) {
-                sub_img_output_path[strlen(output_path) + digit] = (tmp_sign_index % 10) + '0';
-                tmp_sign_index /= 10;
-            }
-            strcpy(sub_img_output_path + strlen(output_path) + 5, ".jpg");
+            std::string sub_img_output_path = output_path + "/" + std::to_string(sign_index) + ".jpg";
 
             // Redraw the current rectangle.
             cv::rectangle(display_image, bounding_rects[i], cv::Scalar(255,0,0), 2);
@@ -168,10 +158,6 @@ int main(int argc, char** argv)
         }
     }
     exit_loop:
-
-    delete [] video_path;
-    delete [] dir_path;
-    delete [] output_path;
 
     return 0;
 }
