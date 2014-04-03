@@ -5,16 +5,6 @@
 #include "GUI/Draw.hpp"
 
 
-void drawBoundingRectangles(cv::Mat& image, const std::vector<std::vector<cv::Point> >& contours, const cv::Scalar& color, const float scale)
-{
-    for (size_t i = 0; i < contours.size(); ++i) {
-        // Scale the rectangle.
-        cv::Rect bounding_rect = scaleRectWithLimits(cv::boundingRect(contours[i]), cv::Point(0,0), cv::Point(image.cols,image.rows), scale);
-        // Draw the rectangle.
-        cv::rectangle(image, bounding_rect.tl(), bounding_rect.br(), color, 2);
-    }
-}
-
 cv::Rect scaleRectWithLimits(const cv::Rect& source_rect, const cv::Point& tl_limit, const cv::Point& br_limit, float scale)
 {
     float position_scale = (scale - 1) / 2;

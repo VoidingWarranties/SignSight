@@ -107,7 +107,10 @@ cv::Mat processingFunction(cv::Mat& image)
     }
 
     std::vector<std::vector<cv::Point> > contours = segmentForeground(image);
-    drawBoundingRectangles(image, contours, cv::Scalar(0,255,0));
+    for (size_t i = 0; i < contours.size(); ++i) {
+        cv::Rect bounding_rect = scaleRectWithLimits(cv::boundingRect(contours[i]), cv::Point(0,0), cv::Point(image.cols,image.rows), default_scale);
+        cv::rectangle(image, bounding_rect.tl(), bounding_rect.br(), cv::Scalar(0,255,0), 2);
+    }
 
     return image;
 }
