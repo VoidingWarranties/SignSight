@@ -1,7 +1,6 @@
 #include <cstdlib>
 #include <cstring>
 #include <dirent.h>
-#include <unistd.h>
 
 #include <list>
 #include <string>
@@ -30,39 +29,43 @@ void print_usage(char* name)
 
 int main(int argc, char** argv)
 {
-    bool video_flag = true;
+    bool video_flag = false;
     std::string video_path;
     bool dir_flag = false;
     std::string dir_path;
+    bool output_flag = false;
     std::string output_path;
 
-    opterr = 0;
-    char c;
-
-    while ((c = getopt(argc, argv, "f:d:o:")) != -1) {
-        switch (c) {
-            case 'f':
-                video_flag = true;
-                dir_flag = false;
-                video_path = std::string(optarg);
-                break;
-            case 'd':
-                dir_flag = true;
-                video_flag = false;
-                dir_path = std::string(optarg);
-                break;
-            case 'o':
-                output_path = std::string(optarg);
-                break;
-            case '?':
+    for (int i = 1; i < argc; ++i) {
+        std::string arg = argv[i];
+        if (arg == "-f") {
+            video_flag = true;
+            if (++i == argc || strlen(argv[i]) <= 0) {
                 print_usage(argv[0]);
                 return 1;
-                break;
-            default:
+            }
+            video_path = std::string(argv[i]);
+        } else if (arg == "-d") {
+            dir_flag = true;
+            if (++i == argc || strlen(argv[i]) <= 0) {
+                print_usage(argv[0]);
                 return 1;
+            }
+            dir_path = std::string(argv[i]);
+        } else if (arg == "-o") {
+            output_flag = true;
+            if (++i == argc || strlen(argv[i]) <= 0) {
+                print_usage(argv[0]);
+                return 1;
+            }
+            output_path = std::string(argv[i]);
+        } else {
+            print_usage(argv[0]);
+            return 1;
         }
     }
-    if ((!(video_flag ^ dir_flag)) || output_path.length() <= 0) {
+
+    if ((!(video_flag ^ dir_flag)) || !output_flag) {
         print_usage(argv[0]);
         return 1;
     }

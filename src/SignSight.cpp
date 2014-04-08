@@ -1,7 +1,6 @@
 #include <cstdlib>
 #include <cstring>
 #include <dirent.h>
-#include <unistd.h>
 
 #include <list>
 #include <string>
@@ -30,45 +29,48 @@ void print_usage(char* name)
 
 int main(int argc, char** argv)
 {
-    bool video_dev_flag = true;
-    int video_index = 0;
+    bool video_dev_flag = false;
+    int video_index;
     bool video_file_flag = false;
     std::string video_path;
     bool dir_flag = false;
     std::string dir_path;
 
-    opterr = 0;
-    char c;
-
-    while ((c = getopt(argc, argv, "v:f:d:")) != -1) {
-        switch (c) {
-            case 'v':
-                video_dev_flag = true;
-                video_file_flag = false;
-                dir_flag = false;
-                video_index = atoi(optarg);
-                break;
-            case 'f':
-                video_dev_flag = false;
-                video_file_flag = true;
-                dir_flag = false;
-                video_path = std::string(optarg);
-                break;
-            case 'd':
-                video_dev_flag = false;
-                video_file_flag = false;
-                dir_flag = true;
-                dir_path = std::string(optarg);
-                break;
-            case '?':
+    for (int i = 1; i < argc; ++i) {
+        std::string arg = argv[i];
+        if (arg == "-v") {
+            video_dev_flag = true;
+            if (++i == argc || strlen(argv[i]) <= 0) {
                 print_usage(argv[0]);
                 return 1;
-                break;
-            default:
+            }
+            video_index = atoi(argv[i]);
+        } else if (arg == "-f") {
+            video_file_flag = true;
+            if (++i == argc || strlen(argv[i]) <= 0) {
+                print_usage(argv[0]);
                 return 1;
+            }
+            video_path = std::string(argv[i]);
+        } else if (arg == "-d") {
+            dir_flag = true;
+            if (++i == argc || strlen(argv[i]) <= 0) {
+                print_usage(argv[0]);
+                return 1;
+            }
+            dir_path = std::string(argv[i]);
+        } else {
+            print_usage(argv[0]);
+            return 1;
         }
     }
-    if (((video_dev_flag && video_file_flag) || (video_dev_flag && dir_flag) || (video_file_flag && dir_flag)) && (video_dev_flag || video_file_flag || dir_flag)) {
+
+    if (!video_dev_flag && !video_file_flag && !dir_flag) {
+        video_dev_flag = true;
+        video_index = 0;
+    }
+
+    if ((video_dev_flag || video_file_flag || !dir_flag) && (video_dev_flag || !video_file_flag || dir_flag) && (!video_dev_flag || video_file_flag || dir_flag)) {
         print_usage(argv[0]);
         return 1;
     }
