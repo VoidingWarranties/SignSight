@@ -6,7 +6,7 @@
 
 #include <opencv2/highgui/highgui.hpp>
 
-#include "GUI/GUI.hpp"
+#include "GUI.hpp"
 
 
 // Displays images from either a specified video device or from images in a specified directory.

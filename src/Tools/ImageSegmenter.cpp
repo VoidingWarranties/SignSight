@@ -11,9 +11,9 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-#include "GUI/GUI.hpp"
-#include "GUI/Draw.hpp"
-#include "ImageProcessing/ImageProcessing.hpp"
+#include "GUI.hpp"
+#include "Draw.hpp"
+#include "ImageProcessing.hpp"
 
 
 void print_usage(char* name)

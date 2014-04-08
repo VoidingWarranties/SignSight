@@ -2,7 +2,7 @@
 
 #include <opencv2/imgproc/imgproc.hpp>
 
-#include "GUI/Draw.hpp"
+#include "Draw.hpp"
 
 
 cv::Rect scaleRectWithLimits(const cv::Rect& source_rect, const cv::Point& tl_limit, const cv::Point& br_limit, float scale)

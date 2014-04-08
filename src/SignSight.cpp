@@ -9,9 +9,9 @@
 
 #include <opencv2/imgproc/imgproc.hpp>
 
-#include "GUI/GUI.hpp"
-#include "GUI/Draw.hpp"
-#include "ImageProcessing/ImageProcessing.hpp"
+#include "GUI.hpp"
+#include "Draw.hpp"
+#include "ImageProcessing.hpp"
 
 
 cv::Mat processingFunction(cv::Mat& image);
