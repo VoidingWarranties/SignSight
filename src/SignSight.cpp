@@ -17,14 +17,21 @@ cv::Mat processingFunction(cv::Mat& image);
 
 void print_usage(char* name)
 {
-    std::cerr << "\n"
-              << "Usage: " << name << " [-v <video_device_index> | -f <video_file> | -d <image_directory_path>]\n"
-              << "\tIf no options are specified video device 0 is used by default.\n"
+    std::cerr << "Usage: " << name << " [-v <dev index> | -f <in file> | -d <in dir>]\n"
+              << "       video device 0 is used by default if no options are specified\n"
+              << "  <dev index> - input video device\n"
+              << "    <in file> - input video file\n"
+              << "     <in dir> - input directory containing only image files\n"
               << "Hot keys:\n"
-              << "\tESC - exit the program\n"
-              << "\tLEFT ARROW - previous image (only when the -d option is used)\n"
-              << "\tRIGHT ARROW - next image (only when the -d option is used)\n"
+              << "          ESC - exit the program\n"
+              << "   LEFT ARROW - previous image (only when the -d option is used)\n"
+              << "  RIGHT ARROW - next image (only when the -d option is used)"
               << std::endl;
+}
+
+void print_missing_option(char* name, const std::string& arg)
+{
+    std::cerr << name << ": missing option after '" << arg << "'" << std::endl;
 }
 
 int main(int argc, char** argv)
@@ -41,26 +48,29 @@ int main(int argc, char** argv)
         if (arg == "-v") {
             video_dev_flag = true;
             if (++i == argc || strlen(argv[i]) <= 0) {
-                print_usage(argv[0]);
+                print_missing_option(argv[0], arg);
                 return 1;
             }
             video_index = atoi(argv[i]);
         } else if (arg == "-f") {
             video_file_flag = true;
             if (++i == argc || strlen(argv[i]) <= 0) {
-                print_usage(argv[0]);
+                print_missing_option(argv[0], arg);
                 return 1;
             }
             video_path = std::string(argv[i]);
         } else if (arg == "-d") {
             dir_flag = true;
             if (++i == argc || strlen(argv[i]) <= 0) {
-                print_usage(argv[0]);
+                print_missing_option(argv[0], arg);
                 return 1;
             }
             dir_path = std::string(argv[i]);
-        } else {
+        } else if (arg == "-h" || arg == "--help") {
             print_usage(argv[0]);
+            return 0;
+        } else {
+            std::cerr << argv[0] << ": invalid argument '" << arg << "'" << std::endl;
             return 1;
         }
     }
@@ -71,7 +81,7 @@ int main(int argc, char** argv)
     }
 
     if ((video_dev_flag || video_file_flag || !dir_flag) && (video_dev_flag || !video_file_flag || dir_flag) && (!video_dev_flag || video_file_flag || dir_flag)) {
-        print_usage(argv[0]);
+        std::cerr << argv[0] << ": need to specify one and only one of the arguments '-v', '-f', or '-d'" << std::endl;
         return 1;
     }
 
