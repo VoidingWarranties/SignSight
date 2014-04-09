@@ -24,7 +24,8 @@ void print_usage(char* name)
               << "Hot keys:\n"
               << "        ESC - exit the program\n"
               << "          y - confirm selected sub-image as a sign and save the sub-image to the output directory\n"
-              << "          n - reject selected sub-image as a sign and do NOT save the sub-image"
+              << "          n - reject selected sub-image as a sign and do NOT save the sub-image\n"
+              << "          s - skip frame (rejects all signs in frame)"
               << std::endl;
 }
 
@@ -150,7 +151,7 @@ int main(int argc, char** argv)
             while (true) {
                 char key = cv::waitKey();
                 if (key == ESCAPE_KEY) {
-                    goto exit_loop;
+                    goto exit_video_loop;
                 } else if (key == 'n') {
                     cv::rectangle(display_image, bounding_rects[i], cv::Scalar(0,0,255), 2);
                     break;
@@ -162,9 +163,12 @@ int main(int argc, char** argv)
                     }
                     cv::rectangle(display_image, bounding_rects[i], cv::Scalar(0,255,0), 2);
                     break;
+                } else if (key == 's') {
+                    goto exit_frame_loop;
                 }
             }
         }
+        exit_frame_loop:
         if (dir_flag) {
             ++file_itr;
             if (file_itr == file_paths.end()) {
@@ -173,7 +177,7 @@ int main(int argc, char** argv)
             }
         }
     }
-    exit_loop:
+    exit_video_loop:
 
     return 0;
 }
