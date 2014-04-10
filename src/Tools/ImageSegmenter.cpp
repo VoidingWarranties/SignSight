@@ -97,6 +97,7 @@ int main(int argc, char** argv)
         }
         if (! boost::filesystem::is_directory(dir)) {
             std::cerr << "'" << dir_path << "' is not a directory" << std::endl;
+            return 2;
         }
         boost::filesystem::directory_iterator end_dir_itr;
         for (boost::filesystem::directory_iterator dir_itr(dir); dir_itr != end_dir_itr; ++dir_itr) {
@@ -104,9 +105,9 @@ int main(int argc, char** argv)
                 file_paths.push_back(dir_itr->path().generic_string());
             }
         }
-        if (file_paths.size() == 0) {
-            std::cerr << "No images found in directory!" << std::endl;
-            return 1;
+        if (file_paths.empty()) {
+            std::cerr << "'" << dir_path << "' does not contain any files" << std::endl;
+            return 2;
         }
     }
 

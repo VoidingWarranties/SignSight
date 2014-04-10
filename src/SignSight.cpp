@@ -104,6 +104,10 @@ int main(int argc, char** argv)
                 file_paths.push_back(dir_itr->path().generic_string());
             }
         }
+        if (file_paths.empty()) {
+            std::cerr << "'" << dir_path << "' does not contain any files" << std::endl;
+            return 2;
+        }
     }
 
     int return_val = displayImageFeed(video_dev_flag, video_index, video_file_flag, video_path, dir_flag, file_paths, processingFunction);
