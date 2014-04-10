@@ -1,10 +1,11 @@
 #include <cstdlib>
 #include <cstring>
-#include <dirent.h>
 
 #include <list>
 #include <string>
 #include <iostream>
+
+#include <boost/filesystem.hpp>
 
 #include <opencv2/imgproc/imgproc.hpp>
 
@@ -88,16 +89,19 @@ int main(int argc, char** argv)
     // Build a list of files in the specified directory
     std::list<std::string> file_paths;
     if (dir_flag) {
-        DIR* dir = opendir(dir_path.c_str());
-        if (! dir) {
-            std::cerr << "Directory " << dir_path << " does not exist!" << std::endl;
-            return 1;
+        boost::filesystem::path dir(dir_path);
+        if (! boost::filesystem::exists(dir)) {
+            std::cerr << "'" << dir_path << "' does not exist" << std::endl;
+            return 2;
         }
-        // Iterate over all files in the specified directory.
-        dirent* file;
-        while ((file = readdir(dir)) != NULL) {
-            if (file && file->d_type == DT_REG) {
-                file_paths.push_back(dir_path + "/" + file->d_name);
+        if (! boost::filesystem::is_directory(dir)) {
+            std::cerr << "'" << dir_path << "' is not a directory" << std::endl;
+            return 2;
+        }
+        boost::filesystem::directory_iterator end_dir_itr;
+        for (boost::filesystem::directory_iterator dir_itr(dir); dir_itr != end_dir_itr; ++dir_itr) {
+            if (boost::filesystem::is_regular_file(dir_itr->status())) {
+                file_paths.push_back(dir_itr->path().generic_string());
             }
         }
     }
